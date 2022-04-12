@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+namespace:名称空间。必须是对应接口的全限定名
+-->
+<mapper namespace="com.it.mapper.BrandMapper">
+
+    <resultMap id="brandResultMap" type="Brand">
+        <result column="brand_name" property="brandName"></result>
+        <result column="company_name" property="companyName"></result>
+    </resultMap>
+    <delete id="deleteByIds">
+        delete from mybatis.tb_brand where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--查询满足条件的数据并进行分页-->
+    <select id="selectByPageAndCondition" resultMap="brandResultMap">
+        select *from mybatis.tb_brand
+        <where>
+            <if test="brand.brandName != null and brand.brandName != '' ">
+                and brand_name like #{brand.brandName}
+            </if>
+
+            <if test="brand.companyName != null and brand.companyName != '' ">
+                and company_name like #{brand.companyName}
+            </if>
+
+            <if test="brand.status != null ">
+                and status = #{brand.status}
+            </if>
+        </where>
+
+        limit #{begin}, #{size}
+    </select>
+
+    <!--查询满足条件的数据条目数-->
+<!--没加 @Param注解 可以直接使用brand变量-->
+<!--控制台中 ### Error提示处就是错误地方!! 注意单词拼写-->
+    <select id="selectTotalCountByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from mybatis.tb_brand
+    <where>
+        <if test="brandName != null and brandName != '' ">
+            and brand_name like #{brandName}
+        </if>
+
+        <if test="companyName != null and companyName != '' ">
+            and company_name like #{companyName}
+        </if>
+
+        <if test="status != null ">
+            and status like #{status}
+        </if>
+    </where>
+    </select>
+</mapper>
